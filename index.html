@@ -145,7 +145,7 @@
 
         function onEachFeature2(feature, layer) {
             if (feature.properties) {
-                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Estado: ' + feature.properties.cps_d_estado + '</p>');
+                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Código postal: ' + feature.properties.d_cp + '</p>');
             }
         }
 
@@ -181,7 +181,7 @@
 
         function onEachFeature3(feature, layer) {
             if (feature.properties) {
-                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Estado: ' + feature.properties.cps_d_estado + '</p>');
+                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Código postal: ' + feature.properties.d_cp + '</p>');
             }
         }
 
@@ -257,7 +257,7 @@ var searchControl2 = new L.Control.Search({
     });
 
     // Eventos de búsqueda
-    searchControl.on('search:locationfound', function (e) {
+    searchControl2.on('search:locationfound', function (e) {
         e.layer.setStyle({fillColor: '#0aecdb', color: '#0ae2ec'});
         if (e.layer._popup) {
             e.layer.openPopup();
