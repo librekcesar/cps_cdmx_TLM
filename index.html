@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="leaflet-search-master/leaflet-search-master/src/leaflet-search.css" />
+    <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
+    <!--Enlaces para llamar librerias de buscador-->
+    <link rel="stylesheet" href="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.css" />
+    <script src="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.js"></script>
+
+    <!--Enlaces para github de buscador-->
+
+    <script src="https://unpkg.com/leaflet@1.3.0/dist/leaflet.js"></script>
+    <script src="https://librekcesar.github.io/busca_zipcodes4/leaflet-search-master/leaflet-search-master/src/leaflet-search.js"></script>
+
+
+    
+    <script type="text/javascript" src="muni_centro_copia.js"></script>
+    <script type="text/javascript" src="cps_d_cdmx_copia.js"></script>
+    <script type="text/javascript" src="cps_d_Mexico_copia.js"></script>
+    
+
+    <style>
+        #map { 
+            width: 100%;
+            height: 900px;
+            box-shadow: 5px 5px 5px #888; 
+        }
+
+        #map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(red, green, blue, alpha);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 25px;
+            z-index: 1000;
+        }
+
+
+        .leaflet-control-search {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+
+#map-legend {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.5em;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+    }
+
+
+
+
+
+    </style>
+</head>
+<body>
+    <div id="map-title"> Códigos postales de CDMX y Estado de México</div>
+    <div id="map"></div>
+
+    <div id="map-legend" class="legend">
+        <h4>Leyenda</h4>
+        <div><span style="background-color: #84e80d; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Categoría 1: División municipal de la CDMX</div>
+        <div><span style="background-color: #d8180c; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Categoría 2: División municipal del Edo. De México</div>
+        <div><span style="background-color: #1d2fc8; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Categoría 3: Códigos postales CDMX</div>
+        <div><span style="background-color: #1d7ec8; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Categoría 4: Códigos postales Edo. De México</div>
+        <div><span style="background-color: gray; width: 20px; height: 20px; display: inline-block; border-radius: 50%;"></span> Utiliza el buscador de la izquierda para encontrar tu código postal</div>
+    </div>
+
+
+
+    <script>
+        var map = L.map("map").setView([19.47094, -99.1792], 11);
+        L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+        ///Primer capa categorizada
+
+        function getColor(NOM_ENT) {
+            switch (NOM_ENT) {
+                case 'Ciudad de Mexico': return '#84e80d';
+                case 'Mexico': return '#d8180c';
+                default: return '#00FF00';
+            }
+        }
+
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.NOM_ENT),
+                weight: 1,
+                opacity: 1,
+                color: 'black',
+                dashArray: '2',
+                fillOpacity: 0.5
+            };
+        }
+
+        function onEachFeature(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup('<p> Nombre de la entidad: ' + feature.properties.NOM_ENT + '</p><p>Municipio: ' + feature.properties.NOMGEO + '</p><p>superficie: ' + feature.properties.AREA  + '</p><p>Clave de municipio: ' + feature.properties.CVE_MUN + '</p>');
+            }
+        }
+
+        var layerGroup = L.geoJSON(muni, {
+            style: style,
+            onEachFeature: onEachFeature
+        });
+
+        ///Segunda capa 
+
+        function getColor2(d_cp){
+            switch(d_cp){
+                case 'Si': return '#ec61db';
+                case 'No': return '#a0ec61';
+                default : return '#1d2fc8';
+            }
+        }
+
+        function style2(feature){
+            return{
+                fillColor: getColor2(feature.properties.d_cp),
+                weight: 1,
+                opacity: 1,
+                color: 'black',
+                dashArray: 2,
+                fillOpacity: 0.5
+            };
+        }
+
+        function onEachFeature2(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Estado: ' + feature.properties.cps_d_estado + '</p>');
+            }
+        }
+
+        var layerGroup2 = L.geoJSON(cdmx, {
+            style: style2,
+            onEachFeature: onEachFeature2
+        });
+
+
+
+
+        ////Tercera capa
+
+
+        function getColor3(d_cp){
+            switch(d_cp){
+                case 'Si': return '#ec61db';
+                case 'No': return '#a0ec61';
+                default : return '#1d7ec8';
+            }
+        }
+
+        function style3(feature){
+            return{
+                fillColor: getColor3(feature.properties.d_cp),
+                weight: 1,
+                opacity: 1,
+                color: 'black',
+                dashArray: 2,
+                fillOpacity: 0.5
+            };
+        }
+
+        function onEachFeature3(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup('<p> Nombre del asentamiento: ' + feature.properties.cps_d_asenta + '</p><p>Tipo de asentamiento: ' + feature.properties.cps_d_tipo_asenta + '</p><p>Municipio: ' + feature.properties.cps_D_mnpio  + '</p><p>Estado: ' + feature.properties.cps_d_estado + '</p>');
+            }
+        }
+
+        var layerGroup3 = L.geoJSON(edomex, {
+            style: style3,
+            onEachFeature: onEachFeature3
+        });
+
+        /////////
+
+
+       
+
+        var baseMaps = {
+            "Mapa Base": map
+        };
+
+
+        var overlayMaps = {
+            "División municipal": layerGroup,
+            "Códigos postales CDMX": layerGroup2,
+            "Códigos postales Edo. México": layerGroup3
+
+           
+        };
+
+        L.control.layers(baseMaps, overlayMaps, {
+            collapsed: false
+        }).addTo(map);
+
+        layerGroup.addTo(map);
+
+ // Configurar el control de búsqueda
+ var searchControl = new L.Control.Search({
+        layer: layerGroup2,
+        propertyName: 'd_cp', // Atributo que se usará en el buscador
+        marker: false,
+        text: "Busca un polígono",
+        title: "Haz click para buscar un polígono por su nombre",
+        moveToLocation: function (latlng, title, map) {
+            map.setView(latlng, 12); // Ajustar el nivel de zoom al ubicar la búsqueda
+        }
+        
+    });
+
+    // Eventos de búsqueda
+    searchControl.on('search:locationfound', function (e) {
+        e.layer.setStyle({fillColor: '#0aecdb', color: '#0ae2ec'});
+        if (e.layer._popup) {
+            e.layer.openPopup();
+        }
+    }).on('search:collapsed', function (e) {
+        featuresLayer.eachLayer(function (layer) {
+            featuresLayer.resetStyle(layer);
+        });
+    });
+
+    map.addControl(searchControl); 
+
+
+    ////Segundo control de busqueda
+// Configurar el control de búsqueda
+var searchControl2 = new L.Control.Search({
+        layer: layerGroup3,
+        propertyName: 'd_cp', // Atributo que se usará en el buscador
+        marker: false,
+        text: "Busca un polígono",
+        title: "Haz click para buscar un polígono por su nombre",
+        moveToLocation: function (latlng, title, map) {
+            map.setView(latlng, 12); // Ajustar el nivel de zoom al ubicar la búsqueda
+        }
+        
+    });
+
+    // Eventos de búsqueda
+    searchControl.on('search:locationfound', function (e) {
+        e.layer.setStyle({fillColor: '#0aecdb', color: '#0ae2ec'});
+        if (e.layer._popup) {
+            e.layer.openPopup();
+        }
+    }).on('search:collapsed', function (e) {
+        featuresLayer.eachLayer(function (layer) {
+            featuresLayer.resetStyle(layer);
+        });
+    });
+
+    map.addControl(searchControl2); 
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
